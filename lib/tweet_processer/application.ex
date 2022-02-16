@@ -8,8 +8,7 @@ defmodule TweetProcesser.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: TweetProcesser.Worker.start_link(arg)
-      # {TweetProcesser.Worker, arg}
+      {TweetProcesser.Receiver, [name: Receiver]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
