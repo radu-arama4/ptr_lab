@@ -41,7 +41,6 @@ defmodule EventsourceEx do
 
       {:noreply, %{parent: parent, message: message, prev_chunk: nil}}
     else
-      # Chunk didn't end with newline - assume data was cut and append next chunk
       {:noreply, %{parent: parent, message: message, prev_chunk: data}}
     end
   end
@@ -51,7 +50,6 @@ defmodule EventsourceEx do
   end
 
   def handle_info(_msg, state) do
-    # Ignore unhandled messages
     {:noreply, state}
   end
 
@@ -71,7 +69,7 @@ defmodule EventsourceEx do
       line ->
         splits = String.split(line, ":", parts: 2)
         [field | rest] = splits
-        value = Enum.join(rest, "") |> String.replace_prefix(" ", "") # Remove single leading space
+        value = Enum.join(rest, "") |> String.replace_prefix(" ", "")
 
         case field do
           "event" -> Map.put(message, :event, value)
@@ -85,8 +83,8 @@ defmodule EventsourceEx do
   end
 
   defp dispatch(parent, message) do
-    message = Map.put(message, :data, message.data |> String.replace_suffix("\n", "")) # Remove single trailing \n from message.data if necessary
-    |> Map.put(:dispatch_ts, DateTime.utc_now) # Add dispatch timestamp
+    message = Map.put(message, :data, message.data |> String.replace_suffix("\n", ""))
+    |> Map.put(:dispatch_ts, DateTime.utc_now)
 
     send(parent, message)
   end

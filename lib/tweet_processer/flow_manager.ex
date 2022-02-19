@@ -1,4 +1,4 @@
-defmodule TweetProcesser.Receiver do
+defmodule TweetProcesser.FlowManager do
   use GenServer
 
   def start_link(opts) do
@@ -11,9 +11,7 @@ defmodule TweetProcesser.Receiver do
   end
 
   defp run_process do
-    EventsourceEx.new("http://localhost:4000/tweets/1", stream_to: self())
+    IO.puts("Hello from flow manager")
   end
 
 end
-
-# "https://url.com/stream", stream_to: self
