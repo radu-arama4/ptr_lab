@@ -100,12 +100,11 @@ defmodule EventsourceEx do
     end
   end
 
-  defp dispatch(parent, message) do
+  defp dispatch(pid, message) do
     message =
       Map.put(message, :data, message.data |> String.replace_suffix("\n", ""))
       |> Map.put(:dispatch_ts, DateTime.utc_now())
 
-    GenServer.cast(parent, {:push, :world})
-    # send(parent, message)
+    GenServer.cast(pid, {:push, message})
   end
 end

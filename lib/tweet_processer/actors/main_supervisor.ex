@@ -1,18 +1,12 @@
 defmodule TweetProcesser.MainSupervisor do
-  use GenServer
   use Supervisor
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  # def handle_cast(message) do
-  #   IO.puts message
-  #   {:noreply}
-  # end
-
   def handle_cast({:push, element}, state) do
-    IO.puts "new message!"
+    IO.inspect element
     {:noreply, [element | state]}
   end
 
