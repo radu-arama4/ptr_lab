@@ -105,8 +105,8 @@ defmodule EventsourceEx do
       Map.put(message, :data, message.data |> String.replace_suffix("\n", ""))
       |> Map.put(:dispatch_ts, DateTime.utc_now())
 
+      TweetProcesser.FlowManager.send_new_message(message)
 
-      TweetProcesser.MainSupervisor.get_cast(message)
-    # GenServer.cast(pid, {:push, message})
+      Process.sleep(1000)
   end
 end

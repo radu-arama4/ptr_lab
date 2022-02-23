@@ -1,46 +1,37 @@
 defmodule TweetProcesser.FlowManager do
   use GenServer
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+  end
+
+  def send_new_message(message) do
+    pid = Process.whereis(TweetProcesser.FlowManager)
+    workers = :sys.get_state(pid)
+    worker = Enum.take_random(workers, 1)
+
+    {worker_pid, _some_pid} = Enum.at(worker, 0)
+
+    Process.send(worker_pid, message, [])
+    # Here Round Robin will be implemented
+  end
+
+  def cast_new_worker(worker_pid) do
+    GenServer.cast(__MODULE__, {:push, worker_pid})
   end
 
   @impl true
-  def init(:ok) do
-    run_process()
-    {:ok, %{}}
+  def handle_cast({:push, worker_pid}, state) do
+    {:noreply, Map.put(state, worker_pid, worker_pid)}
   end
 
-  # defp run_process do
-  #   IO.puts "Hello from flow manager"
-  # end
-
-  # def send_message() do
-  #   IO.puts "HELLO FROM FLOW"
-  # end
-
-  # def handle_call({:get_the_message}, from, state) do
-
-  #   {:message, "Hello", state}
-  # end
-
-  #-----------------------
+  def get_pid() do
+    self()
+  end
 
   @impl true
-  def handle_info(:run, state) do
-    IO.inspect(state)
-    run_process()
-
-    num =
-      [1, 2, 3, "four"]
-      |> Enum.random()
-      |> Kernel.+(0)
-
-    {:noreply, [num | state]}
+  def init(opts) do
+    IO.puts "Flow Manager initialized"
+    {:ok, opts}
   end
-
-  defp run_process do
-    Process.send_after(self(), :run, 2000)
-  end
-
 end
