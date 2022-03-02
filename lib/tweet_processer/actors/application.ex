@@ -5,11 +5,13 @@ defmodule TweetProcesser.Application do
   def start(_type, _args) do
     children = [
       {TweetProcesser.FlowManager, [name: FlowManager]},
-      {TweetProcesser.DummySupervisor, [name: WorkerSupervisor]},
+      {DynamicSupervisor,[strategy: :one_for_one, name: TweetProcesser.DummySupervisor]},
       {TweetProcesser.Receiver, [name: Receiver]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]
+
+    #
 
     Supervisor.start_link(children, opts)
   end

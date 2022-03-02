@@ -24,7 +24,7 @@ defmodule TweetProcesser.FlowManager do
   def handle_cast({:push, worker_pid}, state) do
     {:noreply, Map.put(state, worker_pid, worker_pid)}
   end
-
+#separate into 2 workers and autoscaller may be the 3rd
   def get_pid() do
     self()
   end

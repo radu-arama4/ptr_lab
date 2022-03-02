@@ -1,22 +1,16 @@
 defmodule TweetProcesser.DummySupervisor do
-  use Supervisor
+  use DynamicSupervisor
 
-  def start_link(opts) do
-    Supervisor.start_link(__MODULE__, :ok, opts)
+  def start_link(_opts) do
+    DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
+  end
+
+  def new_child() do
+    {:ok, _pid} = DynamicSupervisor.start_child(TweetProcesser.DummySupervisor, TweetProcesser.Worker)
   end
 
   @impl true
   def init(:ok) do
-    children = [
-      Supervisor.child_spec({TweetProcesser.Worker, []}, id: :my_worker_1),
-      Supervisor.child_spec({TweetProcesser.Worker, []}, id: :my_worker_2),
-      Supervisor.child_spec({TweetProcesser.Worker, []}, id: :my_worker_3),
-      Supervisor.child_spec({TweetProcesser.Worker, []}, id: :my_worker_4),
-      Supervisor.child_spec({TweetProcesser.Worker, []}, id: :my_worker_5)
-    ]
-
-    opts = [strategy: :one_for_one, name: TweetProcesser.WorkerSupervisor]
-
-    Supervisor.init(children, opts)
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 end
