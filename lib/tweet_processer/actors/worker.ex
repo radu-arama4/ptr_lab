@@ -25,7 +25,7 @@ defmodule TweetProcesser.Worker do
 
     IO.puts "Worker with PID:"
     IO.inspect self()
-    IO.puts "NEW MESSAGE"
+    IO.inspect message
     {:noreply, state}
   end
 end

@@ -5,6 +5,12 @@ defmodule TweetProcesser.AutoScaller do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
+  def get_number_of_workers() do
+    pid = Process.whereis(TweetProcesser.AutoScaller)
+    workers = :sys.get_state(pid)
+    {Enum.count(workers)}
+  end
+
   def cast_new_worker() do
     {:ok, worker_pid} = DynamicSupervisor.start_child(TweetProcesser.DummySupervisor, TweetProcesser.Worker)
     GenServer.cast(__MODULE__, {:push, worker_pid})

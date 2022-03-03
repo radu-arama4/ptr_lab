@@ -11,8 +11,7 @@ defmodule TweetProcesser.Receiver do
   end
 
   defp run_process() do
-    DynamicSupervisor.start_child(TweetProcesser.DummySupervisor, TweetProcesser.Worker)
-    DynamicSupervisor.start_child(TweetProcesser.DummySupervisor, TweetProcesser.Worker)
+    TweetProcesser.AutoScaller.add_new_workers(5)
     EventsourceEx.new("http://localhost:4000/tweets/1",stream_to: self())
   end
 

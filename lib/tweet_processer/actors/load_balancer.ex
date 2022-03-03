@@ -16,7 +16,7 @@ defmodule TweetProcesser.LoadBalancer do
       state > length(list)-1 ->
         {:noreply, 0}
       true ->
-        worker = Enum.at(list, 0)
+        worker = Enum.at(list, state)
         Process.send(worker, message, [])
         {:noreply, state+1}
     end
