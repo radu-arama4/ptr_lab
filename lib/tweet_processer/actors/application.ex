@@ -8,7 +8,8 @@ defmodule TweetProcesser.Application do
       {DynamicSupervisor,[strategy: :one_for_one, name: TweetProcesser.DummySupervisor]},
       {TweetProcesser.Receiver, [name: Receiver]},
       {TweetProcesser.Counter, [name: Counter]},
-      {TweetProcesser.AutoScaller, [name: AutoScaller]}
+      {TweetProcesser.AutoScaller, [name: AutoScaller]},
+      {TweetProcesser.LoadBalancer, [name: LoadBalancer]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]
