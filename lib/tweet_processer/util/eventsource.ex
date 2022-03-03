@@ -107,6 +107,10 @@ defmodule EventsourceEx do
 
       TweetProcesser.FlowManager.send_new_message(message)
 
-      Process.sleep(1000)
+      TweetProcesser.Counter.new_message()
+      # send also to some counter, at every secunde it is 0 again
+
+
+      # Process.sleep(1000)
   end
 end

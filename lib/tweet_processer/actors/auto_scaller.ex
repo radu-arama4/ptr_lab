@@ -10,13 +10,19 @@ defmodule TweetProcesser.AutoScaller do
     GenServer.cast(__MODULE__, {:push, worker_pid})
   end
 
+  def add_new_workers(nr_of_workers) do
+    Enum.each(0..nr_of_workers, fn(_x) ->
+      cast_new_worker()
+    end)
+  end
+
   def remove_worker() do
     GenServer.cast(__MODULE__, {:remove})
   end
 
+  @impl true
   def handle_cast({:remove}, state) do
-    pid = Process.whereis(TweetProcesser.FlowManager)
-    workers = :sys.get_state(pid)
+    workers = :sys.get_state(self())
     worker = Enum.take_random(workers, 1)
 
     {worker_pid, _some_pid} = Enum.at(worker, 0)

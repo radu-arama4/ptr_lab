@@ -6,12 +6,12 @@ defmodule TweetProcesser.Application do
     children = [
       {TweetProcesser.FlowManager, [name: FlowManager]},
       {DynamicSupervisor,[strategy: :one_for_one, name: TweetProcesser.DummySupervisor]},
-      {TweetProcesser.Receiver, [name: Receiver]}
+      {TweetProcesser.Receiver, [name: Receiver]},
+      {TweetProcesser.Counter, [name: Counter]},
+      {TweetProcesser.AutoScaller, [name: AutoScaller]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]
-
-    #
 
     Supervisor.start_link(children, opts)
   end

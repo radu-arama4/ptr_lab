@@ -8,8 +8,6 @@ defmodule TweetProcesser.Worker do
   @impl true
   def init(:ok) do
     send_pid_to_flow_manager()
-
-    # pid = Process.whereis(TweetProcesser.FlowManager)
     {:ok, []}
   end
 
@@ -19,10 +17,15 @@ defmodule TweetProcesser.Worker do
 
   @impl true
   def handle_info(message, state) do
-    #here the message will be checked and then printed
+    if String.contains? message.data, "panic" do
+      IO.puts "PANIC!!! KILLING WORKER WITH PID"
+      IO.inspect self()
+      Process.exit(self(), :normal)
+    end
+
     IO.puts "Worker with PID:"
     IO.inspect self()
-    IO.inspect message
+    IO.puts "NEW MESSAGE"
     {:noreply, state}
   end
 end
