@@ -7,16 +7,8 @@ defmodule TweetProcesser.FlowManager do
 
   def send_new_message(message) do
     pid = Process.whereis(TweetProcesser.FlowManager)
-
     workers = :sys.get_state(pid)
-    # worker = Enum.take_random(workers, 1)
-
-    # worker_pid = Enum.at(worker, 0)
-
     TweetProcesser.LoadBalancer.distribute_message({workers, message})
-
-    # Process.send(worker_pid, message, [])
-    # Here Round Robin will be implemented
   end
 
   def cast_new_worker(worker_pid) do

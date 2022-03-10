@@ -12,12 +12,14 @@ defmodule TweetProcesser.AutoScaller do
   end
 
   def cast_new_worker() do
-    {:ok, worker_pid} = DynamicSupervisor.start_child(TweetProcesser.DummySupervisor, TweetProcesser.Worker)
+    {:ok, worker_pid} =
+      DynamicSupervisor.start_child(TweetProcesser.DummySupervisor, TweetProcesser.Worker)
+
     GenServer.cast(__MODULE__, {:push, worker_pid})
   end
 
   def add_new_workers(nr_of_workers) do
-    Enum.each(0..nr_of_workers, fn(_x) ->
+    Enum.each(0..nr_of_workers, fn _x ->
       cast_new_worker()
     end)
   end
@@ -28,14 +30,17 @@ defmodule TweetProcesser.AutoScaller do
 
   @impl true
   def handle_cast({:remove}, state) do
-    workers = :sys.get_state(self())
-    worker = Enum.take_random(workers, 1)
+    # pid = Process.whereis(TweetProcesser.AutoScaller)
+    # workers = :sys.get_state(pid)
+    workers = state
+    current_nr = Enum.count(workers)
 
-    {worker_pid, _some_pid} = Enum.at(worker, 0)
-
-    DynamicSupervisor.terminate_child(TweetProcesser.DummySupervisor, worker_pid)
-
-    Map.delete(state, worker_pid)
+    if current_nr > 5 do
+      worker = Enum.take_random(workers, 1)
+      {worker_pid, _some_pid} = Enum.at(worker, 0)
+      DynamicSupervisor.terminate_child(TweetProcesser.DummySupervisor, worker_pid)
+      {:noreply, Map.delete(state, worker_pid)}
+    end
   end
 
   @impl true

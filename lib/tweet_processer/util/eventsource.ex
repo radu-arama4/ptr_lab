@@ -100,17 +100,12 @@ defmodule EventsourceEx do
     end
   end
 
-  defp dispatch(pid, message) do
+  defp dispatch(_pid, message) do
     message =
       Map.put(message, :data, message.data |> String.replace_suffix("\n", ""))
       |> Map.put(:dispatch_ts, DateTime.utc_now())
 
-      TweetProcesser.FlowManager.send_new_message(message)
-
-      TweetProcesser.Counter.new_message()
-      # send also to some counter, at every secunde it is 0 again
-
-
-      # Process.sleep(1000)
+    TweetProcesser.FlowManager.send_new_message(message)
+    TweetProcesser.Counter.new_message()
   end
 end

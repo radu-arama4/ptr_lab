@@ -17,15 +17,20 @@ defmodule TweetProcesser.Worker do
 
   @impl true
   def handle_info(message, state) do
-    if String.contains? message.data, "panic" do
-      IO.puts "PANIC!!! KILLING WORKER WITH PID"
-      IO.inspect self()
-      Process.exit(self(), :normal)
+    random_number = :rand.uniform(20)
+    :timer.sleep(random_number * 1000)
+
+    case JSON.decode(message.data) do
+      {:ok, tweet} ->
+        mess = tweet["message"]
+        tweet_2 = mess["tweet"]
+        IO.puts("Worker with PID: " <> "#{inspect(self())}, #{tweet_2["text"]}")
+
+      {:error, _error} ->
+        IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")
+        Process.exit(self(), :normal)
     end
 
-    IO.puts "Worker with PID:"
-    IO.inspect self()
-    IO.inspect message
     {:noreply, state}
   end
 end

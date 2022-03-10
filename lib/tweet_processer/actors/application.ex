@@ -4,12 +4,12 @@ defmodule TweetProcesser.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {TweetProcesser.FlowManager, [name: FlowManager]},
-      {DynamicSupervisor,[strategy: :one_for_one, name: TweetProcesser.DummySupervisor]},
-      {TweetProcesser.Receiver, [name: Receiver]},
       {TweetProcesser.Counter, [name: Counter]},
       {TweetProcesser.AutoScaller, [name: AutoScaller]},
-      {TweetProcesser.LoadBalancer, [name: LoadBalancer]}
+      {TweetProcesser.LoadBalancer, [name: LoadBalancer]},
+      {TweetProcesser.FlowManager, [name: FlowManager]},
+      {DynamicSupervisor,[strategy: :one_for_one, name: TweetProcesser.DummySupervisor]},
+      {TweetProcesser.Receiver, [name: Receiver]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]

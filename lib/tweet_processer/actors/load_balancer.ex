@@ -13,18 +13,19 @@ defmodule TweetProcesser.LoadBalancer do
   @impl true
   def handle_cast({list, message}, state) do
     cond do
-      state > length(list)-1 ->
+      state > length(list) - 1 ->
         {:noreply, 0}
+
       true ->
         worker = Enum.at(list, state)
         Process.send(worker, message, [])
-        {:noreply, state+1}
+        {:noreply, state + 1}
     end
   end
 
   @impl true
   def init(opts) do
-    IO.puts "Load Balancer"
+    IO.puts("Load Balancer...")
     {:ok, opts}
   end
 end
