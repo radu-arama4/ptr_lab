@@ -4,8 +4,8 @@ defmodule TweetProcesser.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {TweetProcesser.Counter, [name: Counter]},
       {TweetProcesser.AutoScaller, [name: AutoScaller]},
+      {TweetProcesser.Counter, [name: Counter]},
       {TweetProcesser.LoadBalancer, [name: LoadBalancer]},
       {TweetProcesser.FlowManager, [name: FlowManager]},
       {DynamicSupervisor,[strategy: :one_for_one, name: TweetProcesser.DummySupervisor]},

@@ -35,13 +35,17 @@ defmodule TweetProcesser.Counter do
   end
 
   def check_nr_of_messages(nr_of_messages) do
-    IO.puts(nr_of_messages)
-    # nr_of_workers = TweetProcesser.AutoScaller.get_number_of_workers()
+    nr_of_workers = TweetProcesser.AutoScaller.get_number_of_workers()
+
+    IO.puts "NR. OF WORKERS"
+    IO.inspect nr_of_workers
 
     cond do
       nr_of_messages > 200 ->
-        IO.puts("***Adding 20 workers***")
-        TweetProcesser.AutoScaller.add_new_workers(20)
+        if nr_of_workers < nr_of_messages/2 do
+          IO.puts("***Adding 20 workers***")
+          TweetProcesser.AutoScaller.add_new_workers(20)
+        end
 
       nr_of_messages > 100 ->
         IO.puts("***Adding 10 workers***")
@@ -52,8 +56,10 @@ defmodule TweetProcesser.Counter do
         TweetProcesser.AutoScaller.add_new_workers(5)
 
       nr_of_messages <= 25 ->
-        IO.puts("***Decreasing the number of workers***")
-        TweetProcesser.AutoScaller.remove_worker()
+        if nr_of_workers > nr_of_messages do
+          IO.puts("***Decreasing the number of workers***")
+          TweetProcesser.AutoScaller.remove_worker()
+        end
     end
   end
 

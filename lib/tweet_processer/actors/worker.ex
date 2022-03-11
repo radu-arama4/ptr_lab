@@ -17,7 +17,7 @@ defmodule TweetProcesser.Worker do
 
   @impl true
   def handle_info(message, state) do
-    random_number = :rand.uniform(20)
+    random_number = :rand.uniform(6)
     :timer.sleep(random_number * 1000)
 
     case JSON.decode(message.data) do
