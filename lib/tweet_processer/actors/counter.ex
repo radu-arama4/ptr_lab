@@ -35,31 +35,23 @@ defmodule TweetProcesser.Counter do
   end
 
   def check_nr_of_messages(nr_of_messages) do
-    nr_of_workers = TweetProcesser.AutoScaller.get_number_of_workers()
+    {nr_of_workers} = TweetProcesser.AutoScaller.get_number_of_workers()
 
-    IO.puts "NR. OF WORKERS"
+    desired_nr_of_workers = round(nr_of_messages / 11)
+
     IO.inspect nr_of_workers
 
     cond do
-      nr_of_messages > 200 ->
-        if nr_of_workers < nr_of_messages/2 do
-          IO.puts("***Adding 20 workers***")
-          TweetProcesser.AutoScaller.add_new_workers(20)
-        end
-
-      nr_of_messages > 100 ->
-        IO.puts("***Adding 10 workers***")
-        TweetProcesser.AutoScaller.add_new_workers(10)
-
-      nr_of_messages > 25 ->
-        IO.puts("***Adding 5 workers***")
-        TweetProcesser.AutoScaller.add_new_workers(5)
-
-      nr_of_messages <= 25 ->
-        if nr_of_workers > nr_of_messages do
-          IO.puts("***Decreasing the number of workers***")
+      nr_of_workers < desired_nr_of_workers ->
+        workers_to_add = desired_nr_of_workers - nr_of_workers
+        TweetProcesser.AutoScaller.add_new_workers(workers_to_add)
+      nr_of_workers > desired_nr_of_workers ->
+        workers_to_remove = nr_of_workers - desired_nr_of_workers
+        Enum.each(0..workers_to_remove, fn(_x) ->
           TweetProcesser.AutoScaller.remove_worker()
-        end
+        end)
+      true ->
+        IO.puts "Everything fine!"
     end
   end
 

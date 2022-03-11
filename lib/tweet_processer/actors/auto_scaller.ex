@@ -33,27 +33,16 @@ defmodule TweetProcesser.AutoScaller do
     end)
   end
 
-  def remove_workers(nr_of_workers_to_remove) do
-    Enum.each(0..nr_of_workers_to_remove, fn(_x) ->
-      remove_worker()
-    end)
-  end
-
   def remove_worker() do
     GenServer.cast(__MODULE__, {:remove})
   end
 
   @impl true
   def handle_cast({:remove}, state) do
-    workers = state
-    current_nr = Enum.count(workers)
-
-    if current_nr > 5 do
-      worker = Enum.take_random(workers, 1)
-      {worker_pid, _some_pid} = Enum.at(worker, 0)
-      DynamicSupervisor.terminate_child(TweetProcesser.DummySupervisor, worker_pid)
-      {:noreply, Map.delete(state, worker_pid)}
-    end
+    worker = Enum.take_random(state, 1)
+    {worker_pid, _some_pid} = Enum.at(worker, 0)
+    DynamicSupervisor.terminate_child(TweetProcesser.DummySupervisor, worker_pid)
+    {:noreply, Map.delete(state, worker_pid)}
   end
 
   @impl true
