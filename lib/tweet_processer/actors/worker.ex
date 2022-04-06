@@ -20,16 +20,18 @@ defmodule TweetProcesser.Worker do
     random_number = Enum.random(50..500)
     :timer.sleep(random_number)
 
-    case JSON.decode(message.data) do
-      {:ok, tweet} ->
-        mess = tweet["message"]
-        tweet_2 = mess["tweet"]
-        IO.puts("Worker with PID: " <> "#{inspect(self())}, #{tweet_2["text"]}")
+    IO.inspect message
 
-      {:error, _error} ->
-        IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")
-        Process.exit(self(), :normal)
-    end
+    # case JSON.decode(message.data) do
+    #   {:ok, tweet} ->
+    #     mess = tweet["message"]
+    #     tweet_2 = mess["tweet"]
+    #     IO.puts("Worker with PID: " <> "#{inspect(self())}, #{tweet_2["text"]}")
+
+    #   {:error, _error} ->
+    #     IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")
+    #     Process.exit(self(), :normal)
+    # end
 
     {:noreply, state}
   end
