@@ -100,12 +100,23 @@ defmodule EventsourceEx do
     end
   end
 
-  defp dispatch(_pid, message) do
+  defp dispatch(pid, message) do
     message =
       Map.put(message, :data, message.data |> String.replace_suffix("\n", ""))
       |> Map.put(:dispatch_ts, DateTime.utc_now())
 
+
+    flow_manager_pid = TweetProcesser.SiblingsAccesor.get_sibling(pid, TweetProcesser.FlowManager)
+    IO.inspect flow_manager_pid
+    #counter pid
+
+    children = Supervisor.which_children(pid)
+
+    IO.inspect children
+
     TweetProcesser.FlowManager.send_new_message(message)
     TweetProcesser.Counter.new_message()
+
+
   end
 end

@@ -13,7 +13,7 @@ defmodule TweetProcesser.Counter do
   end
 
   def new_message() do
-    GenServer.cast(__MODULE__, {:push})
+    GenServer.cast(__MODULE__, {:push}) # to be replaced
   end
 
   @impl true
@@ -28,7 +28,7 @@ defmodule TweetProcesser.Counter do
 
   @impl true
   def handle_info(:reset, state) do
-    GenServer.cast(__MODULE__, {:reset})
+    GenServer.cast(__MODULE__, {:reset})   # to replaced
     check_nr_of_messages(state)
     run_reset_process()
     {:noreply, state}

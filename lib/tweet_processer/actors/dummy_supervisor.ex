@@ -11,6 +11,7 @@ defmodule TweetProcesser.DummySupervisor do
 
   @impl true
   def init(:ok) do
+    IO.puts "STARTEED!"
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 end
