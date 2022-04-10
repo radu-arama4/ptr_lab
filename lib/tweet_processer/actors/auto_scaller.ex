@@ -1,8 +1,8 @@
 defmodule TweetProcesser.AutoScaller do
   use GenServer
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [workers: %{}, opts: opts], name: __MODULE__)
   end
 
   def get_number_of_workers() do
@@ -12,7 +12,7 @@ defmodule TweetProcesser.AutoScaller do
 
   @impl true
   def handle_call({:get, :workers}, _from, state) do
-    {:reply, state, state}
+    {:reply, state[:workers], state}
   end
 
   @impl true
@@ -39,15 +39,15 @@ defmodule TweetProcesser.AutoScaller do
 
   @impl true
   def handle_cast({:remove}, state) do
-    worker = Enum.take_random(state, 1)
+    worker = Enum.take_random(state[:workers], 1)
     {worker_pid, _some_pid} = Enum.at(worker, 0)
     DynamicSupervisor.terminate_child(TweetProcesser.DummySupervisor, worker_pid)
-    {:noreply, Map.delete(state, worker_pid)}
+    {:noreply, [workers: Map.delete(state[:workers], worker_pid), opts: state[:opts]]}
   end
 
   @impl true
   def handle_cast({:push, worker_pid}, state) do
-    {:noreply, Map.put(state, worker_pid, worker_pid)}
+    {:noreply, [workers: Map.put(state[:workers], worker_pid, worker_pid), opts: state[:opts]]}
   end
 
   @impl true
