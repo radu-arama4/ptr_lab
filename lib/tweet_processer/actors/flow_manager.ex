@@ -16,6 +16,11 @@ defmodule TweetProcesser.FlowManager do
   end
 
   @impl true
+  def handle_call(:send, _from, state) do
+    {:reply, state}
+  end
+
+  @impl true
   def handle_cast({:push, worker_pid}, state) do
     {:noreply, Enum.concat(state, [worker_pid])}
   end
