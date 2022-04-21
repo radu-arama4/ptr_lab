@@ -1,9 +1,12 @@
 defmodule TweetProcesser.LoadBalancer do
   use GenServer
 
-  def start_link(_opts) do
+  def start_link(opts) do
     index = 0
-    GenServer.start_link(__MODULE__, index, name: __MODULE__)
+
+    GenServer.start_link(__MODULE__, %{:index => index, :wp_pid => opts[:wp_pid]},
+      name: __MODULE__
+    )
   end
 
   def distribute_message({list, message}) do
@@ -12,14 +15,16 @@ defmodule TweetProcesser.LoadBalancer do
 
   @impl true
   def handle_cast({list, message}, state) do
+    index = state[:index]
+
     cond do
-      state > length(list) - 1 ->
-        {:noreply, 0}
+      index > length(list) - 1 ->
+        {:noreply, %{:index => 0, :wp_pid => state[:wp_pid]}}
 
       true ->
-        worker = Enum.at(list, state)
+        worker = Enum.at(list, index)
         Process.send(worker, message, [])
-        {:noreply, state + 1}
+        {:noreply, %{:index => index + 1, :wp_pid => state[:wp_pid]}}
     end
   end
 

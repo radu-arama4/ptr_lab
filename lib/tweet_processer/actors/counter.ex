@@ -12,10 +12,6 @@ defmodule TweetProcesser.Counter do
     {:ok, opts}
   end
 
-  def new_message() do
-    GenServer.cast(__MODULE__, {:push}) # to be replaced
-  end
-
   @impl true
   def handle_cast({:push}, state) do
     {:noreply, state + 1}
@@ -28,10 +24,9 @@ defmodule TweetProcesser.Counter do
 
   @impl true
   def handle_info(:reset, state) do
-    GenServer.cast(__MODULE__, {:reset})   # to replaced
     check_nr_of_messages(state)
     run_reset_process()
-    {:noreply, state}
+    {:noreply, 0}
   end
 
   def check_nr_of_messages(nr_of_messages) do
@@ -39,19 +34,22 @@ defmodule TweetProcesser.Counter do
 
     desired_nr_of_workers = round(nr_of_messages / 11)
 
-    IO.inspect nr_of_workers
+    IO.inspect(nr_of_workers)
 
     cond do
       nr_of_workers < desired_nr_of_workers ->
         workers_to_add = desired_nr_of_workers - nr_of_workers
         TweetProcesser.AutoScaller.add_new_workers(workers_to_add)
+
       nr_of_workers > desired_nr_of_workers ->
         workers_to_remove = nr_of_workers - desired_nr_of_workers
-        Enum.each(0..workers_to_remove, fn(_x) ->
+
+        Enum.each(0..workers_to_remove, fn _x ->
           TweetProcesser.AutoScaller.remove_worker()
         end)
+
       true ->
-        IO.puts "Everything fine!"
+        IO.puts("Everything fine!")
     end
   end
 
