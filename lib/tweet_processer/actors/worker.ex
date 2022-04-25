@@ -7,6 +7,8 @@ defmodule TweetProcesser.Worker do
 
   @impl true
   def init(opts) do
+    IO.puts("New worker of type: ")
+    IO.inspect(opts[:type_of_worker])
     send_pid_to_flow_manager(opts[:wp_pid])
     {:ok, []}
   end

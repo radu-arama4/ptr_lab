@@ -4,7 +4,11 @@ defmodule TweetProcesser.AutoScaller do
   def start_link(opts) do
     IO.puts("Auto scaller started")
 
-    GenServer.start_link(__MODULE__, [workers: %{}, wp_pid: opts[:wp_pid]], name: __MODULE__)
+    GenServer.start_link(
+      __MODULE__,
+      [workers: %{}, type_of_worker: opts[:type_of_worker], wp_pid: opts[:wp_pid]],
+      name: __MODULE__
+    )
   end
 
   @impl true
@@ -27,7 +31,12 @@ defmodule TweetProcesser.AutoScaller do
 
     DynamicSupervisor.terminate_child(worker_supervisor_pid, worker_pid)
 
-    {:noreply, [workers: Map.delete(state[:workers], worker_pid), wp_pid: state[:wp_pid]]}
+    {:noreply,
+     [
+       workers: Map.delete(state[:workers], worker_pid),
+       type_of_worker: state[:type_of_worker],
+       wp_pid: state[:wp_pid]
+     ]}
   end
 
   @impl true
@@ -38,11 +47,15 @@ defmodule TweetProcesser.AutoScaller do
     {:ok, worker_pid} =
       DynamicSupervisor.start_child(
         worker_supervisor_pid,
-        {TweetProcesser.Worker, [type_of_worker: "Sentimental", wp_pid: state[:wp_pid]]}
+        {TweetProcesser.Worker, [type_of_worker: state[:type_of_worker], wp_pid: state[:wp_pid]]}
       )
 
     {:noreply,
-     [workers: Map.put(state[:workers], worker_pid, worker_pid), wp_pid: state[:wp_pid]]}
+     [
+       workers: Map.put(state[:workers], worker_pid, worker_pid),
+       type_of_worker: state[:type_of_worker],
+       wp_pid: state[:wp_pid]
+     ]}
   end
 
   @impl true
