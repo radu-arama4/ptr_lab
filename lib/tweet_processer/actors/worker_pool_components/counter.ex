@@ -6,13 +6,13 @@ defmodule TweetProcesser.Counter do
 
     GenServer.start_link(
       __MODULE__,
-      %{:nr_of_messages => nr_of_messages, :wp_pid => opts[:wp_pid]},
-      name: __MODULE__
+      %{:nr_of_messages => nr_of_messages, :wp_pid => opts[:wp_pid]}
     )
   end
 
   @impl true
   def init(opts) do
+    IO.puts("Counter initialized")
     run_reset_process()
     {:ok, opts}
   end
@@ -56,7 +56,6 @@ defmodule TweetProcesser.Counter do
 
         Enum.each(0..workers_to_remove, fn _x ->
           GenServer.cast(autoscaller_pid, {:remove})
-          # TweetProcesser.AutoScaller.remove_worker()
         end)
 
       true ->

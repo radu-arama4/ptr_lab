@@ -4,9 +4,7 @@ defmodule TweetProcesser.LoadBalancer do
   def start_link(opts) do
     index = 0
 
-    GenServer.start_link(__MODULE__, %{:index => index, :wp_pid => opts[:wp_pid]},
-      name: __MODULE__
-    )
+    GenServer.start_link(__MODULE__, %{:index => index, :wp_pid => opts[:wp_pid]})
   end
 
   def distribute_message({list, message}) do
@@ -30,7 +28,7 @@ defmodule TweetProcesser.LoadBalancer do
 
   @impl true
   def init(opts) do
-    IO.puts("Load Balancer...")
+    IO.puts("Load Balancer initialized")
     {:ok, opts}
   end
 end

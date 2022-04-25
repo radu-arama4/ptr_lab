@@ -3,16 +3,19 @@ defmodule TweetProcesser.Application do
 
   @impl true
   def start(_type, _args) do
-    # here I should be able to define as many worker pools as I want
-    # Example:
-    # {TweetProcesser.Worker_Pool, [type: Sentiment]}
-    # {TweetProcesser.Worker_Pool, [type: Engagement]}
-
-    # Children: receiver, receiver_2, [worker_pool#1, worker_pool#2, worker_pool#3 ...], aggregator, batcher, data_layer_manager
-
     children = [
-      {TweetProcesser.WorkerPool,
-       [strategy: :one_for_one, name: TweetProcesser.WorkerPool, type_of_worker: "Sentimental"]}
+      {TweetProcesser.MainLoadBalancer, [main_pid: self()]},
+      Supervisor.child_spec(
+        {TweetProcesser.WorkerPool,
+         [name: TweetProcesser.WorkerPool, type_of_worker: "Sentimental"]},
+        id: :wp1
+      ),
+      Supervisor.child_spec(
+        {TweetProcesser.WorkerPool,
+         [name: TweetProcesser.WorkerPool2, type_of_worker: "Engaged"]},
+        id: :wp2
+      ),
+      {TweetProcesser.Receiver, [name: Receiver, main_pid: self()]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]

@@ -101,14 +101,18 @@ defmodule EventsourceEx do
   end
 
   defp dispatch(pid, message) do
+    # wp_pid = TweetProcesser.SiblingsAccesor.get_sibling(pid, TweetProcesser.WorkerPool)
+
     message = Map.put(message, :data, message.data |> String.replace_suffix("\n", ""))
 
-    {flow_manager_pid} =
-      TweetProcesser.SiblingsAccesor.get_sibling(pid, TweetProcesser.FlowManager)
+    GenServer.cast(TweetProcesser.MainLoadBalancer, {:send, message})
 
-    {counter_pid} = TweetProcesser.SiblingsAccesor.get_sibling(pid, TweetProcesser.Counter)
+    # {flow_manager_pid} =
+    #   TweetProcesser.SiblingsAccesor.get_sibling(pid, TweetProcesser.FlowManager)
 
-    GenServer.cast(flow_manager_pid, {:send, message})
-    GenServer.cast(counter_pid, {:push})
+    # {counter_pid} = TweetProcesser.SiblingsAccesor.get_sibling(pid, TweetProcesser.Counter)
+
+    # GenServer.cast(flow_manager_pid, {:send, message})
+    # GenServer.cast(counter_pid, {:push})
   end
 end

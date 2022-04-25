@@ -2,12 +2,11 @@ defmodule TweetProcesser.AutoScaller do
   use GenServer
 
   def start_link(opts) do
-    IO.puts("Auto scaller started")
-
     GenServer.start_link(
       __MODULE__,
-      [workers: %{}, type_of_worker: opts[:type_of_worker], wp_pid: opts[:wp_pid]],
-      name: __MODULE__
+      workers: %{},
+      type_of_worker: opts[:type_of_worker],
+      wp_pid: opts[:wp_pid]
     )
   end
 
@@ -60,6 +59,7 @@ defmodule TweetProcesser.AutoScaller do
 
   @impl true
   def init(opts) do
+    IO.puts("Auto Scaller initialized")
     {:ok, opts}
   end
 end

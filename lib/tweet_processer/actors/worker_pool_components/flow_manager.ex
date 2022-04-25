@@ -2,7 +2,7 @@ defmodule TweetProcesser.FlowManager do
   use GenServer
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, %{:workers => [], :wp_pid => opts[:wp_pid]}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, %{:workers => [], :wp_pid => opts[:wp_pid]})
   end
 
   @impl true

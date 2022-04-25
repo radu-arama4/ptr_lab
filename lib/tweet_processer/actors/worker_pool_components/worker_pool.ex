@@ -9,6 +9,9 @@ defmodule TweetProcesser.WorkerPool do
   def init(opts) do
     type_of_worker = opts[:type_of_worker]
 
+    # storing the current worker pool pid inside the state of main load balancer
+    GenServer.cast(TweetProcesser.MainLoadBalancer, {:push, self()})
+
     children = [
       {TweetProcesser.AutoScaller,
        [name: AutoScaller, type_of_worker: type_of_worker, wp_pid: self()]},
@@ -17,17 +20,17 @@ defmodule TweetProcesser.WorkerPool do
        [name: LoadBalancer, type_of_worker: type_of_worker, wp_pid: self()]},
       {TweetProcesser.FlowManager,
        [name: FlowManager, type_of_worker: type_of_worker, wp_pid: self()]},
-      {DynamicSupervisor,
+      {TweetProcesser.DummySupervisor,
        [
-         strategy: :one_for_one,
-         name: TweetProcesser.DummySupervisor,
+         name: DummySupervisor,
          type_of_worker: type_of_worker,
          wp_pid: self()
-       ]},
-      {TweetProcesser.Receiver, [name: Receiver, type_of_worker: type_of_worker, wp_pid: self()]}
+       ]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.WorkerPool]
+
+    IO.puts("Worker Pool initialized")
 
     Supervisor.init(children, opts)
   end
