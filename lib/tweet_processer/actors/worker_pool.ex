@@ -10,11 +10,20 @@ defmodule TweetProcesser.WorkerPool do
     type_of_worker = opts[:type_of_worker]
 
     children = [
-      {TweetProcesser.AutoScaller, [name: AutoScaller, type_of_worker: type_of_worker, wp_pid: self()]},
+      {TweetProcesser.AutoScaller,
+       [name: AutoScaller, type_of_worker: type_of_worker, wp_pid: self()]},
       {TweetProcesser.Counter, [name: Counter, type_of_worker: type_of_worker, wp_pid: self()]},
-      {TweetProcesser.LoadBalancer, [name: LoadBalancer, type_of_worker: type_of_worker, wp_pid: self()]},
-      {TweetProcesser.FlowManager, [name: FlowManager, type_of_worker: type_of_worker, wp_pid: self()]},
-      {DynamicSupervisor,[strategy: :one_for_one, name: TweetProcesser.DummySupervisor, type_of_worker: type_of_worker, wp_pid: self()]},
+      {TweetProcesser.LoadBalancer,
+       [name: LoadBalancer, type_of_worker: type_of_worker, wp_pid: self()]},
+      {TweetProcesser.FlowManager,
+       [name: FlowManager, type_of_worker: type_of_worker, wp_pid: self()]},
+      {DynamicSupervisor,
+       [
+         strategy: :one_for_one,
+         name: TweetProcesser.DummySupervisor,
+         type_of_worker: type_of_worker,
+         wp_pid: self()
+       ]},
       {TweetProcesser.Receiver, [name: Receiver, type_of_worker: type_of_worker, wp_pid: self()]}
     ]
 
@@ -22,7 +31,6 @@ defmodule TweetProcesser.WorkerPool do
 
     Supervisor.init(children, opts)
   end
-
 end
 
-#Supervisor.which_children(TweetProcesser.WorkerPool)
+# Supervisor.which_children(TweetProcesser.WorkerPool)

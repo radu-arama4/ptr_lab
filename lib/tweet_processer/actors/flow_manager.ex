@@ -5,10 +5,6 @@ defmodule TweetProcesser.FlowManager do
     GenServer.start_link(__MODULE__, %{:workers => [], :wp_pid => opts[:wp_pid]}, name: __MODULE__)
   end
 
-  # def cast_new_worker(worker_pid) do
-  #   GenServer.cast(__MODULE__, {:push, worker_pid})
-  # end
-
   @impl true
   def handle_cast({:send, message}, state) do
     {load_balancer_pid} =

@@ -2,17 +2,20 @@ defmodule TweetProcesser.Worker do
   use GenServer
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+    GenServer.start_link(__MODULE__, opts, opts)
   end
 
   @impl true
-  def init(:ok) do
-    send_pid_to_flow_manager()
+  def init(opts) do
+    send_pid_to_flow_manager(opts[:wp_pid])
     {:ok, []}
   end
 
-  defp send_pid_to_flow_manager() do
-    TweetProcesser.FlowManager.cast_new_worker(self())
+  defp send_pid_to_flow_manager(wp_pid) do
+    {flow_manager_pid} =
+      TweetProcesser.SiblingsAccesor.get_sibling(wp_pid, TweetProcesser.FlowManager)
+
+    GenServer.cast(flow_manager_pid, {:push, self()})
   end
 
   @impl true

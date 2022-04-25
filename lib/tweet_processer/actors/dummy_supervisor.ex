@@ -2,7 +2,8 @@ defmodule TweetProcesser.DummySupervisor do
   use DynamicSupervisor
 
   def start_link(opts) do
-    DynamicSupervisor.start_link(__MODULE__, opts, name: __MODULE__)
+    IO.puts("Dummy supervisor start link")
+    DynamicSupervisor.start_link(__MODULE__, opts)
   end
 
   def new_child() do
@@ -12,7 +13,7 @@ defmodule TweetProcesser.DummySupervisor do
 
   @impl true
   def init(:ok) do
-    IO.puts("STARTEED!")
+    IO.puts("Dummy supervisor started!")
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 end

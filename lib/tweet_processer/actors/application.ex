@@ -11,7 +11,8 @@ defmodule TweetProcesser.Application do
     # Children: receiver, receiver_2, [worker_pool#1, worker_pool#2, worker_pool#3 ...], aggregator, batcher, data_layer_manager
 
     children = [
-      {TweetProcesser.WorkerPool, [strategy: :one_for_one, name: TweetProcesser.WorkerPool, type_of_worker: "Sentimental"]}
+      {TweetProcesser.WorkerPool,
+       [strategy: :one_for_one, name: TweetProcesser.WorkerPool, type_of_worker: "Sentimental"]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]
