@@ -10,7 +10,7 @@ defmodule TweetProcesser.Worker do
     # IO.puts("New worker of type: ")
     # IO.inspect(opts[:type_of_worker])
     send_pid_to_flow_manager(opts[:wp_pid])
-    {:ok, []}
+    {:ok, opts}
   end
 
   defp send_pid_to_flow_manager(wp_pid) do
@@ -20,6 +20,23 @@ defmodule TweetProcesser.Worker do
     GenServer.cast(flow_manager_pid, {:push, self()})
   end
 
+  defp process_sentimental_score(message) do
+  end
+
+  defp process_engagement_ratio(message) do
+    message = message["message"]["tweet"]
+    user = message["user"]
+
+    favorite_count = message["favorite_count"]
+    retweet_count = message["retweet_count"]
+    followers_count = user["followers_count"]
+
+    engagement_ratio = (favorite_count + retweet_count) / followers_count
+
+    IO.puts("engagement ratio: ")
+    IO.inspect(engagement_ratio)
+  end
+
   @impl true
   def handle_info(message, state) do
     random_number = Enum.random(50..500)
@@ -27,13 +44,16 @@ defmodule TweetProcesser.Worker do
 
     case JSON.decode(message.data) do
       {:ok, tweet} ->
-        mess = tweet["message"]
-        tweet_2 = mess["tweet"]
+        case state[:type_of_worker] do
+          "Sentimental" ->
+            process_sentimental_score(tweet)
 
-      # IO.puts("Worker with PID: " <> "#{inspect(self())}, #{tweet_2["text"]}")
+          "Engaged" ->
+            process_engagement_ratio(tweet)
+        end
 
       {:error, _error} ->
-        # IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")
+        IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")
         Process.exit(self(), :normal)
     end
 
