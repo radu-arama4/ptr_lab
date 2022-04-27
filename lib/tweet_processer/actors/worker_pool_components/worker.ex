@@ -21,6 +21,12 @@ defmodule TweetProcesser.Worker do
   end
 
   defp process_sentimental_score(message) do
+    text = message["message"]["tweet"]["text"]
+    words = String.split(text)
+
+    for word <- words do
+      # will get the score for this specific word
+    end
   end
 
   defp process_engagement_ratio(message) do

@@ -15,7 +15,8 @@ defmodule TweetProcesser.Application do
          [name: TweetProcesser.WorkerPool2, type_of_worker: "Engaged"]},
         id: :wp2
       ),
-      {TweetProcesser.Receiver, [name: Receiver, main_pid: self()]}
+      {TweetProcesser.Receiver, [name: Receiver, main_pid: self()]},
+      {TweetProcesser.Receiver2, [name: Receiver2, main_pid: self()]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]
