@@ -56,7 +56,7 @@ defmodule TweetProcesser.Receiver2 do
     #     raise "Don't know how to parse received chunk: \"#{chunk}\""
     # end
 
-    IO.inspect(chunk)
+    # IO.inspect(chunk)
 
     {:noreply, nil}
   end

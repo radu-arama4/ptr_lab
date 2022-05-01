@@ -15,11 +15,9 @@ defmodule TweetProcesser.WorkerPool do
     children = [
       {TweetProcesser.AutoScaller,
        [name: AutoScaller, type_of_worker: type_of_worker, wp_pid: self()]},
-      {TweetProcesser.Counter, [name: Counter, type_of_worker: type_of_worker, wp_pid: self()]},
-      {TweetProcesser.LoadBalancer,
-       [name: LoadBalancer, type_of_worker: type_of_worker, wp_pid: self()]},
-      {TweetProcesser.FlowManager,
-       [name: FlowManager, type_of_worker: type_of_worker, wp_pid: self()]},
+      {TweetProcesser.Counter, [wp_pid: self()]},
+      {TweetProcesser.LoadBalancer, [name: LoadBalancer, wp_pid: self()]},
+      {TweetProcesser.FlowManager, [name: FlowManager, wp_pid: self()]},
       {TweetProcesser.DummySupervisor,
        [
          name: DummySupervisor,

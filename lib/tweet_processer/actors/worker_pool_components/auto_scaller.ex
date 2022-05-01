@@ -46,7 +46,7 @@ defmodule TweetProcesser.AutoScaller do
     {:ok, worker_pid} =
       DynamicSupervisor.start_child(
         worker_supervisor_pid,
-        {TweetProcesser.Worker, [type_of_worker: state[:type_of_worker], wp_pid: state[:wp_pid]]}
+        {state[:type_of_worker], [wp_pid: state[:wp_pid]]}
       )
 
     {:noreply,

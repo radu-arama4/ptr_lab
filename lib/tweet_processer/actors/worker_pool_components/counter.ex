@@ -42,6 +42,7 @@ defmodule TweetProcesser.Counter do
 
     nr_of_workers = GenServer.call(autoscaller_pid, {:get, :nr_of_workers})
 
+    IO.puts("Nr of workers - ")
     IO.inspect(nr_of_workers)
 
     desired_nr_of_workers = round(nr_of_messages / 11)

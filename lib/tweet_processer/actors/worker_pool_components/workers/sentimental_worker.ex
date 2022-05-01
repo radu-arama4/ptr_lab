@@ -1,4 +1,4 @@
-defmodule TweetProcesser.Worker do
+defmodule TweetProcesser.SentimentalWorker do
   use GenServer
 
   def start_link(opts) do
@@ -7,8 +7,7 @@ defmodule TweetProcesser.Worker do
 
   @impl true
   def init(opts) do
-    # IO.puts("New worker of type: ")
-    # IO.inspect(opts[:type_of_worker])
+    IO.puts("New sentimental worker!")
     send_pid_to_flow_manager(opts[:wp_pid])
     {:ok, opts}
   end
@@ -29,20 +28,6 @@ defmodule TweetProcesser.Worker do
     end
   end
 
-  defp process_engagement_ratio(message) do
-    message = message["message"]["tweet"]
-    user = message["user"]
-
-    favorite_count = message["favorite_count"]
-    retweet_count = message["retweet_count"]
-    followers_count = user["followers_count"]
-
-    engagement_ratio = (favorite_count + retweet_count) / followers_count
-
-    IO.puts("engagement ratio: ")
-    IO.inspect(engagement_ratio)
-  end
-
   @impl true
   def handle_info(message, state) do
     random_number = Enum.random(50..500)
@@ -50,13 +35,7 @@ defmodule TweetProcesser.Worker do
 
     case JSON.decode(message.data) do
       {:ok, tweet} ->
-        case state[:type_of_worker] do
-          "Sentimental" ->
-            process_sentimental_score(tweet)
-
-          "Engaged" ->
-            process_engagement_ratio(tweet)
-        end
+        process_sentimental_score(tweet)
 
       {:error, _error} ->
         IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")

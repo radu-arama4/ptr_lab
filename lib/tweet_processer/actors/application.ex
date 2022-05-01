@@ -6,14 +6,21 @@ defmodule TweetProcesser.Application do
     children = [
       {TweetProcesser.MainLoadBalancer, [main_pid: self()]},
       Supervisor.child_spec(
-        {TweetProcesser.WorkerPool,
-         [name: TweetProcesser.WorkerPool, type_of_worker: "Sentimental"]},
+        {
+          TweetProcesser.WorkerPool,
+          [name: TweetProcesser.WorkerPool, type_of_worker: TweetProcesser.SentimentalWorker]
+        },
         id: :wp1
       ),
       Supervisor.child_spec(
         {TweetProcesser.WorkerPool,
-         [name: TweetProcesser.WorkerPool2, type_of_worker: "Engaged"]},
+         [name: TweetProcesser.WorkerPool2, type_of_worker: TweetProcesser.SentimentalWorker]},
         id: :wp2
+      ),
+      Supervisor.child_spec(
+        {TweetProcesser.WorkerPool,
+         [name: TweetProcesser.WorkerPool3, type_of_worker: TweetProcesser.EngagedWorker]},
+        id: :wp3
       ),
       {TweetProcesser.Receiver, [name: Receiver, main_pid: self()]},
       {TweetProcesser.Receiver2, [name: Receiver2, main_pid: self()]}
