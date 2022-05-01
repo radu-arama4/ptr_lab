@@ -11,7 +11,7 @@ defmodule TweetProcesser.Aggregator do
 
     for tweet <- list_of_engaged do
       if tweet["user"]["screen_name"] == received_tweet["user"]["screen_name"] do
-        IO.puts("FOUND MATCH FOR SENTIMENTAL!!!")
+        merge_tweets(received_tweet, tweet)
       end
     end
 
@@ -29,7 +29,7 @@ defmodule TweetProcesser.Aggregator do
 
     for tweet <- list_of_sentimental do
       if tweet["user"]["screen_name"] == received_tweet["user"]["screen_name"] do
-        IO.puts("FOUND MATCH FOR ENGAGEMENT!!!")
+        merge_tweets(tweet, received_tweet)
       end
     end
 
@@ -39,6 +39,13 @@ defmodule TweetProcesser.Aggregator do
        engaged: Enum.concat(state[:engaged], [received_tweet]),
        ready: []
      ]}
+  end
+
+  def merge_tweets(sentimental_tweet, engagement_tweet) do
+    sentimental_score = sentimental_tweet["sentimental_score"]
+    ready_tweet = Map.put(engagement_tweet, "sentimental_score", sentimental_score)
+
+    Process.send(TweetProcesser.DataLayerManager, {:tweet, ready_tweet}, [])
   end
 
   @impl true
