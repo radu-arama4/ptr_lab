@@ -4,14 +4,8 @@ defmodule TweetProcesser.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {TweetProcesser.Aggregator, [name: TweetProcesser.Aggregator]},
       {TweetProcesser.MainLoadBalancer, [main_pid: self()]},
-      Supervisor.child_spec(
-        {
-          TweetProcesser.WorkerPool,
-          [name: TweetProcesser.WorkerPool, type_of_worker: TweetProcesser.SentimentalWorker]
-        },
-        id: :wp1
-      ),
       Supervisor.child_spec(
         {TweetProcesser.WorkerPool,
          [name: TweetProcesser.WorkerPool2, type_of_worker: TweetProcesser.SentimentalWorker]},
@@ -23,7 +17,7 @@ defmodule TweetProcesser.Application do
         id: :wp3
       ),
       {TweetProcesser.Receiver, [name: Receiver, main_pid: self()]},
-      {TweetProcesser.Receiver2, [name: Receiver2, main_pid: self()]}
+      {TweetProcesser.Receiver2, [name: Receiver2]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]
