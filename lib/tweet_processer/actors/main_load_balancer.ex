@@ -17,39 +17,64 @@ defmodule TweetProcesser.MainLoadBalancer do
 
   @impl true
   def handle_cast({:send, message}, state) do
-    index = state[:wp_index]
     worker_pools_list = state[:worker_pools]
 
-    current_worker_pool = Enum.at(worker_pools_list, index)
+    sentimental_wp = Enum.at(worker_pools_list, 0)
+    engagement_wp = Enum.at(worker_pools_list, 1)
 
-    index = index + 1
+    {sent_flow_manager_pid} =
+      TweetProcesser.SiblingsAccesor.get_sibling(sentimental_wp, TweetProcesser.FlowManager)
 
-    {flow_manager_pid} =
-      TweetProcesser.SiblingsAccesor.get_sibling(current_worker_pool, TweetProcesser.FlowManager)
+    {sent_counter_pid} =
+      TweetProcesser.SiblingsAccesor.get_sibling(sentimental_wp, TweetProcesser.Counter)
 
-    {counter_pid} =
-      TweetProcesser.SiblingsAccesor.get_sibling(current_worker_pool, TweetProcesser.Counter)
+    {eng_flow_manager_pid} =
+      TweetProcesser.SiblingsAccesor.get_sibling(engagement_wp, TweetProcesser.FlowManager)
 
-    GenServer.cast(flow_manager_pid, {:send, message})
-    GenServer.cast(counter_pid, {:push})
+    {eng_counter_pid} =
+      TweetProcesser.SiblingsAccesor.get_sibling(engagement_wp, TweetProcesser.Counter)
 
-    cond do
-      index > length(worker_pools_list) - 1 ->
-        {:noreply,
-         %{
-           :worker_pools => state[:worker_pools],
-           :wp_index => 0,
-           :main_pid => state[:main_pid]
-         }}
+    GenServer.cast(sent_flow_manager_pid, {:send, message})
+    GenServer.cast(sent_counter_pid, {:push})
 
-      true ->
-        {:noreply,
-         %{
-           :worker_pools => state[:worker_pools],
-           :wp_index => index,
-           :main_pid => state[:main_pid]
-         }}
-    end
+    GenServer.cast(eng_flow_manager_pid, {:send, message})
+    GenServer.cast(eng_counter_pid, {:push})
+
+    {:noreply, state}
+
+    # index = state[:wp_index]
+    # worker_pools_list = state[:worker_pools]
+
+    # current_worker_pool = Enum.at(worker_pools_list, index)
+
+    # index = index + 1
+
+    # {flow_manager_pid} =
+    #   TweetProcesser.SiblingsAccesor.get_sibling(current_worker_pool, TweetProcesser.FlowManager)
+
+    # {counter_pid} =
+    #   TweetProcesser.SiblingsAccesor.get_sibling(current_worker_pool, TweetProcesser.Counter)
+
+    # GenServer.cast(flow_manager_pid, {:send, message})
+    # GenServer.cast(counter_pid, {:push})
+
+    # cond do
+    #   index > length(worker_pools_list) - 1 ->
+    #     {:noreply,
+    #      %{
+    #        :worker_pools => state[:worker_pools],
+    #        :wp_index => 0,
+    #        :main_pid => state[:main_pid]
+    #      }}
+
+    #   true ->
+    #     {:noreply,
+    #      %{
+    #        :worker_pools => state[:worker_pools],
+    #        :wp_index => index,
+    #        :main_pid => state[:main_pid]
+    #      }}
+    # end
   end
 
   @impl true
