@@ -1,28 +1,29 @@
 defmodule TweetProcesser.Batcher do
   use GenServer
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, [tweets: []], name: __MODULE__)
+  def start_link(opts) do
+    GenServer.start_link(
+      __MODULE__,
+      [tweets: [], batching_size: opts.size, batching_time_frame: opts.time],
+      name: __MODULE__
+    )
   end
 
   @impl true
   def init(opts) do
-    perform_batching()
+    perform_batching(opts[:time_frame])
     {:ok, opts}
   end
 
   @impl true
   def handle_info({:batch}, state) do
-    # will send message to data_layer_manager
-    size = 5
+    Process.send(TweetProcesser.DataLayerManager, {:batch, state[:batching_size]}, [])
 
-    Process.send(TweetProcesser.DataLayerManager, {:batch, size}, [])
-
-    perform_batching()
+    perform_batching(state[:time_frame])
     {:noreply, state}
   end
 
-  defp perform_batching() do
-    Process.send_after(self(), {:batch}, 1000)
+  defp perform_batching(time_frame) do
+    Process.send_after(self(), {:batch}, time_frame)
   end
 end
