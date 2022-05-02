@@ -19,12 +19,19 @@ defmodule TweetProcesser.DataLayerManager do
       tweets_to_store = Enum.take(state[:tweets], size)
 
       {:ok, pid} = Mongo.start_link(url: "mongodb://localhost:27018/tweet_processor")
+
+      for tweet <- tweets_to_store do
+        user = tweet["user"]
+        Mongo.insert_one(pid, "users", user)
+      end
+
       {:ok, result} = Mongo.insert_many(pid, "tweets", tweets_to_store)
 
       IO.inspect(result)
+      {:noreply, [tweets: Enum.drop(state[:tweets], size)]}
+    else
+      {:noreply, state}
     end
-
-    {:noreply, state}
   end
 
   @impl true

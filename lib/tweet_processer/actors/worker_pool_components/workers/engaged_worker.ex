@@ -29,8 +29,6 @@ defmodule TweetProcesser.EngagedWorker do
 
     engagement_ratio = (favorite_count + retweet_count) / followers_count
 
-    # IO.puts("Engagement ratio: " <> "#{inspect(engagement_ratio)}")
-
     message = Map.put(message, "engagement_ratio", engagement_ratio)
 
     GenServer.cast(TweetProcesser.Aggregator, {:put_eng, message})
