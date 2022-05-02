@@ -2,7 +2,7 @@ defmodule TweetProcesser.Receiver2 do
   use GenServer
 
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, [text: "", score: %{}], name: __MODULE__)
+    GenServer.start_link(__MODULE__, [text: ""], name: __MODULE__)
   end
 
   @impl true
@@ -21,20 +21,22 @@ defmodule TweetProcesser.Receiver2 do
   end
 
   @impl true
-  def handle_call({:get}, _from, state) do
-    if state[:score] == %{} do
-      list = String.split(state[:text], "\r\n")
+  def handle_call({:get, word_to_check}, _from, state) do
+    list = String.split(state[:text], "\r\n")
 
-      map = %{}
+    default_score = 0
 
-      for value <- list do
-        [word, score] = String.split(value, "\t")
-        Map.put(map, word, score)
-      end
+    elem =
+      Enum.find(list, nil, fn value ->
+        [word, _score] = String.split(value, "\t")
+        word == word_to_check
+      end)
 
-      {:reply, map, [text: "", score: map]}
+    if elem != nil do
+      [_word, score] = String.split(elem, "\t")
+      {:reply, score, state}
     else
-      {:reply, state[:score], state}
+      {:reply, default_score, state}
     end
   end
 

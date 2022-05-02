@@ -24,19 +24,21 @@ defmodule TweetProcesser.SentimentalWorker do
     message = message["message"]["tweet"]
     words = String.split(text)
 
-    # map = GenServer.call(TweetProcesser.Receiver2, {:get})
+    sentimental_score =
+      Enum.reduce(words, 0, fn word, sum ->
+        score = GenServer.call(TweetProcesser.Receiver2, {:get, word})
 
-    # IO.inspect(map)
-
-    sentimental_score = 2
+        if score != 0 do
+          {int_val, ""} = Integer.parse(score)
+          sum + int_val
+        else
+          0
+        end
+      end)
 
     message = Map.put(message, "sentimental_score", sentimental_score)
 
     GenServer.cast(TweetProcesser.Aggregator, {:put_sent, message})
-
-    # for word <- words do
-    #   # will get the score for this specific word
-    # end
   end
 
   @impl true
