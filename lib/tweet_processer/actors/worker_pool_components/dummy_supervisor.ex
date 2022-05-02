@@ -6,7 +6,7 @@ defmodule TweetProcesser.DummySupervisor do
   end
 
   @impl true
-  def init(opts) do
+  def init(_opts) do
     IO.puts("Dummy Supervisor initialized")
     DynamicSupervisor.init(strategy: :one_for_one)
   end

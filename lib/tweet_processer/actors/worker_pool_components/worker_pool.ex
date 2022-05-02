@@ -33,5 +33,3 @@ defmodule TweetProcesser.WorkerPool do
     Supervisor.init(children, opts)
   end
 end
-
-# Supervisor.which_children(TweetProcesser.WorkerPool)

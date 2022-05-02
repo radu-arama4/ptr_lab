@@ -13,7 +13,16 @@ defmodule TweetProcesser.DataLayerManager do
 
   @impl true
   def handle_info({:batch, size}, state) do
-    IO.puts("Storing to db a batch frame with size " <> "#{inspect(size)}")
+    if length(state[:tweets]) >= size do
+      IO.puts("Storing to db a batch frame with size " <> "#{inspect(size)}")
+
+      tweets_to_store = Enum.take(state[:tweets], size)
+
+      {:ok, pid} = Mongo.start_link(url: "mongodb://localhost:27018/tweet_processor")
+      {:ok, result} = Mongo.insert_many(pid, "tweets", tweets_to_store)
+
+      IO.inspect(result)
+    end
 
     {:noreply, state}
   end

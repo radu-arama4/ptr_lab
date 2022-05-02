@@ -20,7 +20,7 @@ defmodule TweetProcesser.Application do
       {TweetProcesser.Receiver, [name: Receiver, main_pid: self()]},
       {TweetProcesser.Receiver2, [name: Receiver2]},
       # here will be given the parameters
-      {TweetProcesser.Batcher, [time: 1000, size: 5]}
+      {TweetProcesser.Batcher, [time: 1000, batch_size: 5]}
     ]
 
     opts = [strategy: :one_for_one, name: TweetProcesser.Supervisor]
