@@ -20,18 +20,23 @@ defmodule TweetProcesser.EngagedWorker do
   end
 
   defp process_engagement_ratio(message) do
-    message = message["message"]["tweet"]
     user = message["user"]
 
     favorite_count = message["favorite_count"]
     retweet_count = message["retweet_count"]
     followers_count = user["followers_count"]
 
+    # IO.puts("HERE -> " <> "#{favorite_count} " <> "#{retweet_count} " <> "#{followers_count} ")
+
     engagement_ratio = (favorite_count + retweet_count) / followers_count
 
     message = Map.put(message, "engagement_ratio", engagement_ratio)
 
     GenServer.cast(TweetProcesser.Aggregator, {:put_eng, message})
+
+    if message["retweeted_status"] != nil do
+      process_engagement_ratio(message["retweeted_status"])
+    end
   end
 
   @impl true
@@ -41,7 +46,7 @@ defmodule TweetProcesser.EngagedWorker do
 
     case JSON.decode(message.data) do
       {:ok, tweet} ->
-        process_engagement_ratio(tweet)
+        process_engagement_ratio(tweet["message"]["tweet"])
 
       {:error, _error} ->
         IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")

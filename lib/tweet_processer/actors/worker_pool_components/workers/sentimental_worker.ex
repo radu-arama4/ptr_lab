@@ -20,8 +20,7 @@ defmodule TweetProcesser.SentimentalWorker do
   end
 
   defp process_sentimental_score(message) do
-    text = message["message"]["tweet"]["text"]
-    message = message["message"]["tweet"]
+    text = message["text"]
     words = String.split(text)
 
     sentimental_score =
@@ -39,6 +38,10 @@ defmodule TweetProcesser.SentimentalWorker do
     message = Map.put(message, "sentimental_score", sentimental_score)
 
     GenServer.cast(TweetProcesser.Aggregator, {:put_sent, message})
+
+    if message["retweeted_status"] != nil do
+      process_sentimental_score(message["retweeted_status"])
+    end
   end
 
   @impl true
@@ -48,7 +51,7 @@ defmodule TweetProcesser.SentimentalWorker do
 
     case JSON.decode(message.data) do
       {:ok, tweet} ->
-        process_sentimental_score(tweet)
+        process_sentimental_score(tweet["message"]["tweet"])
 
       {:error, _error} ->
         IO.puts("PANIC!!! KILLING WORKER WITH PID " <> "#{inspect(self())}")

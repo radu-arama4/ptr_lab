@@ -7,7 +7,6 @@ defmodule TweetProcesser.DataLayerManager do
 
   @impl true
   def handle_info({:tweet, tweet}, state) do
-    IO.puts("Received tweet in data layer manager!")
     {:noreply, [tweets: Enum.concat(state[:tweets], [tweet])]}
   end
 
