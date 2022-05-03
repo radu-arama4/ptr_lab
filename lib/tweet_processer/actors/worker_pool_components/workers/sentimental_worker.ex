@@ -31,11 +31,11 @@ defmodule TweetProcesser.SentimentalWorker do
           {int_val, ""} = Integer.parse(score)
           sum + int_val
         else
-          0
+          sum
         end
       end)
 
-    message = Map.put(message, "sentimental_score", sentimental_score)
+    message = Map.put(message, "sentimental_score", sentimental_score / length(words))
 
     GenServer.cast(TweetProcesser.Aggregator, {:put_sent, message})
 

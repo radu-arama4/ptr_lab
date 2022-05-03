@@ -3,7 +3,6 @@ defmodule TweetProcesser.LoadBalancer do
 
   def start_link(opts) do
     index = 0
-
     GenServer.start_link(__MODULE__, %{:index => index, :wp_pid => opts[:wp_pid]})
   end
 

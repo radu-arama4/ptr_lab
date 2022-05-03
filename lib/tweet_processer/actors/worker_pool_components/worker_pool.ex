@@ -13,14 +13,12 @@ defmodule TweetProcesser.WorkerPool do
     GenServer.cast(TweetProcesser.MainLoadBalancer, {:push, self()})
 
     children = [
-      {TweetProcesser.AutoScaller,
-       [name: AutoScaller, type_of_worker: type_of_worker, wp_pid: self()]},
+      {TweetProcesser.AutoScaller, [type_of_worker: type_of_worker, wp_pid: self()]},
       {TweetProcesser.Counter, [wp_pid: self()]},
-      {TweetProcesser.LoadBalancer, [name: LoadBalancer, wp_pid: self()]},
-      {TweetProcesser.FlowManager, [name: FlowManager, wp_pid: self()]},
+      {TweetProcesser.LoadBalancer, [wp_pid: self()]},
+      {TweetProcesser.FlowManager, [wp_pid: self()]},
       {TweetProcesser.DummySupervisor,
        [
-         name: DummySupervisor,
          type_of_worker: type_of_worker,
          wp_pid: self()
        ]}
