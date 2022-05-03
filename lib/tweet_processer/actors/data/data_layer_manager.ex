@@ -13,7 +13,7 @@ defmodule TweetProcesser.DataLayerManager do
   @impl true
   def handle_info({:batch, size}, state) do
     if length(state[:tweets]) >= size do
-      IO.puts("Storing to db a batch frame with size " <> "#{inspect(size)}")
+      IO.puts("Storing to DB " <> "#{inspect(size)}" <> " tweets!")
 
       tweets_to_store = Enum.take(state[:tweets], size)
 
@@ -24,9 +24,8 @@ defmodule TweetProcesser.DataLayerManager do
         Mongo.insert_one(pid, "users", user)
       end
 
-      {:ok, result} = Mongo.insert_many(pid, "tweets", tweets_to_store)
+      {:ok, _result} = Mongo.insert_many(pid, "tweets", tweets_to_store)
 
-      IO.inspect(result)
       {:noreply, [tweets: Enum.drop(state[:tweets], size)]}
     else
       {:noreply, state}
