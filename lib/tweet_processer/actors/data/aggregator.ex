@@ -9,8 +9,9 @@ defmodule TweetProcesser.Aggregator do
   def handle_cast({:put_sent, received_tweet}, state) do
     list_of_engaged = state[:engaged]
 
+    # verify with tweet_id
     for tweet <- list_of_engaged do
-      if tweet["user"]["screen_name"] == received_tweet["user"]["screen_name"] do
+      if tweet["id"] == received_tweet["id"] do
         merge_tweets(received_tweet, tweet)
       end
     end
@@ -27,7 +28,7 @@ defmodule TweetProcesser.Aggregator do
     list_of_sentimental = state[:sentimental]
 
     for tweet <- list_of_sentimental do
-      if tweet["user"]["screen_name"] == received_tweet["user"]["screen_name"] do
+      if tweet["id"] == received_tweet["id"] do
         merge_tweets(tweet, received_tweet)
       end
     end
