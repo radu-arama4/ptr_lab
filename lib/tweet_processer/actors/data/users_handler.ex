@@ -55,14 +55,17 @@ defmodule TweetProcesser.UsersHandler do
         sum + ratio
       end)
 
-    total_ratio = ratio_sum / length(ratios)
-
-    IO.puts(
-      "Updating the total engagement ratio to - " <>
-        "#{inspect(total_ratio)}"
-    )
+    total_ratio = (ratio_sum / length(ratios)) |> Float.round(2)
 
     Mongo.update_one(pid, "users", parameter, "$set": [engagement_ratios: ratios])
-    Mongo.update_one(pid, "users", parameter, "$set": [total_engagement_ratio: total_ratio])
+
+    if(total_ratio != right_user["total_engagement_ratio"]) do
+      IO.puts(
+        "Updating the total engagement ratio to - " <>
+          "#{inspect(total_ratio)}"
+      )
+
+      Mongo.update_one(pid, "users", parameter, "$set": [total_engagement_ratio: total_ratio])
+    end
   end
 end
