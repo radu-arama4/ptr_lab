@@ -11,6 +11,11 @@ defmodule TweetProcesser.DataLayerManager do
   end
 
   @impl true
+  def handle_call({:get_nr_of_tweets}, _from, state) do
+    {:reply, length(state[:tweets]), state}
+  end
+
+  @impl true
   def handle_info({:batch, size}, state) do
     if length(state[:tweets]) >= size do
       IO.puts("Storing to DB " <> "#{inspect(size)}" <> " tweets!")
@@ -31,6 +36,12 @@ defmodule TweetProcesser.DataLayerManager do
       {:noreply, state}
     end
   end
+
+  # defp check_existing_user(screen_name, pid) do
+  #   parameter = %{"screen_name" => screen_name}
+  #   found_user = Mongo.find_one(pid, "users", parameter)
+  #   {found_user}
+  # end
 
   @impl true
   def init(opts) do
