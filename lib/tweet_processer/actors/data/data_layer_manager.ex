@@ -24,10 +24,7 @@ defmodule TweetProcesser.DataLayerManager do
 
       {:ok, pid} = Mongo.start_link(url: "mongodb://localhost:27018/tweet_processor")
 
-      for tweet <- tweets_to_store do
-        user = tweet["user"]
-        Mongo.insert_one(pid, "users", user)
-      end
+      GenServer.cast(TweetProcesser.UsersHandler, {:check_user, tweets_to_store, pid})
 
       {:ok, _result} = Mongo.insert_many(pid, "tweets", tweets_to_store)
 
@@ -36,12 +33,6 @@ defmodule TweetProcesser.DataLayerManager do
       {:noreply, state}
     end
   end
-
-  # defp check_existing_user(screen_name, pid) do
-  #   parameter = %{"screen_name" => screen_name}
-  #   found_user = Mongo.find_one(pid, "users", parameter)
-  #   {found_user}
-  # end
 
   @impl true
   def init(opts) do

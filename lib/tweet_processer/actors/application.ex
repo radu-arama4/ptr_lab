@@ -4,6 +4,7 @@ defmodule TweetProcesser.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {TweetProcesser.UsersHandler, []},
       {TweetProcesser.DataLayerManager, []},
       {TweetProcesser.Aggregator, [name: TweetProcesser.Aggregator]},
       {TweetProcesser.MainLoadBalancer, [main_pid: self()]},
