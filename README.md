@@ -1,6 +1,18 @@
 # TweetProcesser
 
-**TODO: Add description**
+Laboratory work for PTR course.
+System for tweet processing and storing to database.
+
+It uses the actor model in order to handle the concurrency.
+
+Implemented functionalities:
+- Autoscalling
+- Load balancing
+- Supervision
+- Parameterizable worker pools
+- Database storing
+
+For system overview (Supervision tree and System architecture) see <em>_docs</em>.
 
 ## Installation
 
@@ -18,4 +30,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/tweet_processer](https://hexdocs.pm/tweet_processer).
-
